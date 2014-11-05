@@ -13,7 +13,7 @@ object AccessManager {
 
 
   def grantAccessTo(email: String): Unit = DB.withConnection{implicit c =>
-    SQL"""INSERT INTO AllowedEmail(email) values ($email)""".executeInsert()
+    SQL"""INSERT INTO AllowedEmail(email) values ($email)""".execute()
   }
 
   def hasAccess(email: String): Boolean = DB.withConnection{implicit c =>
