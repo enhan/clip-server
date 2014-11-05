@@ -63,4 +63,7 @@ object Assignments extends Controller{
   }
 
 
+  def assignmentsForSong(id: Long) = Action{ request =>
+    Ok(Json.toJson(assignmentDao.findForSongId(id)))
+  }
 }

@@ -3,11 +3,17 @@
 # ~~~~
 
 # Home page
-OPTIONS     /*all               controllers.OptionsController.returnsOk(all)
-GET         /songs              controllers.Assignments.getAll
-POST        /songs              controllers.Assignments.createSong
-GET         /assignments        controllers.Assignments.getAllAssignments
-POST        /engagements        controllers.Engagements.createEngagements
+OPTIONS        /*all                         controllers.OptionsController.returnsOk(all)
+GET            /songs                        controllers.Assignments.getAll
+POST           /songs                        controllers.Assignments.createSong
+GET            /songs/:id/assignments        controllers.Assignments.assignmentsForSong(id: Long)
+GET            /assignments                  controllers.Assignments.getAllAssignments
+POST           /engagements                  controllers.Engagements.createEngagements
+POST           /access                       controllers.Access.controlAccess()
+
+# Admin
+POST           /admin/access                 controllers.Admin.grantAccess
+GET            /admin/access                 controllers.Admin.grantedAccess
 
 
 

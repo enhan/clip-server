@@ -48,4 +48,8 @@ object DBSongDao extends SongDao{
       Song(song.id, song.name, assignmentDao.findForSongId(song.id.get))
     }
   }
+
+  def findById(id: Long): Option[Song] = DB.withConnection{ implicit c =>
+    SQL"""select id, name from Song where id = $id""".as(parser.singleOpt).headOption
+  }
 }

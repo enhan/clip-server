@@ -6,6 +6,11 @@ import play.api.data.validation.ValidationError
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import utils.MailSender
+
+import scala.concurrent.Future
+
 /**
  * @author Emmanuel Nhan
  */
@@ -18,13 +23,27 @@ object Engagements extends Controller{
       (JsPath \ "email").read[String](Reads.email)
     )((assignment, email) => Engagement(None, email, assignment, completed = false))
 
-  def createEngagements = Action(parse.json){ implicit request =>
+  def createEngagements = Action.async(parse.json){ implicit request =>
     request.body.validate[List[Engagement]].map{engagements =>
       val created = engagements.map(DBEngagementDao.createEngagement)
-      // TODO : SEND mail
-      Ok
+      // Create a map with songs
+      val email = created.head.email
+      def appendRecursive(toParse: List[Engagement], acc: Map[Song, List[Assignment]]): Map[Song,List[Assignment]] ={
+        toParse match {
+          case Nil => acc
+          case head :: tail =>
+            val assignment = DBAssignmentDao.findById(head.assignmentId).get
+            val song = DBSongDao.findById(assignment.songId).get
+            val newList = if (acc.contains(song)) assignment :: acc(song) else List(assignment)
+            val newAcc = acc +(song -> newList)
+            appendRecursive(tail, newAcc)
+        }
+      }
+
+      val data = appendRecursive(created, Map[Song, List[Assignment]]())
+      MailSender.sendRecapMail(email, data).map{r => Ok}
     }.getOrElse{
-      BadRequest
+      Future.successful(BadRequest)
     }
 
   }

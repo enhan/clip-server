@@ -1,0 +1,16 @@
+@(engagements: Map[Song, List[Assignment]])
+<h1>Récapitulatif de mon engagement Lipdub:</h1>
+
+<p>Chaque paragraphe correspond à un clip que j'ai à enregistrer.</p>
+@for(song <- engagements.keys){
+    <h2>@song.name</h2>
+    @for(engagement <- engagements(song)){
+        <p style="border: 1px thin">
+            @engagement.pre
+            <br/>
+            @engagement.content
+            <br/>
+            @engagement.post
+        </p>
+    }
+}

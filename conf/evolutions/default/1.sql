@@ -10,9 +10,9 @@ create table Assignment(
     id serial NOT NULL,
     song_id integer NOT NULL,
     rank integer NOT NULL,
-    content varchar(255) NOT NULL,
-    pre varchar(255),
-    post varchar(255),
+    content varchar(1024) NOT NULL,
+    pre varchar(1024),
+    post varchar(1024),
     spots integer NOT NULL,
     primary key (id),
     foreign key (song_id) references Song(id)
@@ -29,6 +29,9 @@ create table Engagement(
     unique(email, assignment_id)
 );
 
+create table AllowedEmail(
+    email varchar(255) primary key
+);
 
 # --- !Downs
 
