@@ -45,7 +45,7 @@ object DBAssignmentDao extends AssignmentDao{
   }
 
   override def findAll: List[Assignment] = DB.withConnection{implicit c =>
-    val selectAll = SQL"""select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots"""
+    val selectAll = SQL"""select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id"""
     val result =selectAll.as(assignmentParser *).toList
     Logger.debug("RES = " + result)
     result
@@ -53,11 +53,11 @@ object DBAssignmentDao extends AssignmentDao{
 
 
   override def findForSongId(songId: Long): List[Assignment] = DB.withConnection{implicit c =>
-    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.song_id = $songId group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots order by a.rank""".as(assignmentParser *).toList
+    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.song_id = $songId group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id order by a.rank""".as(assignmentParser *).toList
   }
 
   override def findById(id: Long): Option[Assignment] = DB.withConnection{implicit c =>
-    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.id = $id group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots""".as(assignmentParser.singleOpt)
+    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.id = $id group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id""".as(assignmentParser.singleOpt)
   }
 
 }
