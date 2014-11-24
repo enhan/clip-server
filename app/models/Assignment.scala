@@ -99,9 +99,9 @@ class AssignmentGenerator(val songId:Long, val spots: Int, val blockSize:Int = 2
 
   }
 
-  def preProcess(content: String) = content.split("\\R").toList
+  def preProcess(content: String) = content.split("\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]").toList
 
-  def songSplit(content: String) = content.split("\\R{2,}").map(preProcess).toList
+  def songSplit(content: String) = content.split("(\\u000D\\u000A|[\\u000A\\u000B\\u000C\\u000D\\u0085\\u2028\\u2029]){2,}").map(preProcess).toList
 
   def parseSong(content: String) = {
     val splited = songSplit(content)
