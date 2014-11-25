@@ -1,15 +1,16 @@
 package controllers
 
+import actors.{SendSummary, MailActor}
+import akka.actor.Props
 import models._
-import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import utils.MailSender
+import play.api.libs.concurrent.Akka
+import play.api.Play.current
 
-import scala.concurrent.Future
+
 
 /**
  * @author Emmanuel Nhan
@@ -23,7 +24,7 @@ object Engagements extends Controller{
       (JsPath \ "email").read[String](Reads.email)
     )((assignment, email) => Engagement(None, email, assignment, completed = false))
 
-  def createEngagements = Action.async(parse.json){ implicit request =>
+  def createEngagements = Action(parse.json){ implicit request =>
     request.body.validate[List[Engagement]].map{engagements =>
       val created = engagements.map(DBEngagementDao.createEngagement)
       // Create a map with songs
@@ -41,9 +42,11 @@ object Engagements extends Controller{
       }
 
       val data = appendRecursive(created, Map[Song, List[Assignment]]())
-      MailSender.sendRecapMail(email, data).map{r => Ok}
+      val mailActor = Akka.system.actorOf(Props[MailActor])
+      mailActor ! SendSummary(email, data)
+      Ok
     }.getOrElse{
-      Future.successful(BadRequest)
+      BadRequest
     }
 
   }

@@ -1,13 +1,13 @@
 package controllers
 
+import actors.{MailActor, SendWelcome}
+import akka.actor.Props
 import models.AccessManager
-import play.api.mvc._
+import play.api.libs.concurrent.Akka
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import utils.MailSender
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-import scala.concurrent.Future
+import play.api.mvc._
+import play.api.Play.current
 
 /**
  * @author Emmanuel Nhan
@@ -25,17 +25,21 @@ object Admin extends Controller{
       (JsPath \ "email").read[String](Reads.email)
     )(AllowedUser.apply _)
 
-  def grantAccess() = Action.async(parse.json){ implicit request =>
+  def grantAccess() = Action(parse.json){ implicit request =>
 
     def createAccess(email: String) = {
       AccessManager.grantAccessTo(email)
       // Send email
-      MailSender.sendWelcomeMail(email)
+      val mailActor = Akka.system.actorOf(Props[MailActor])
+      mailActor ! SendWelcome(email)
     }
 
 
-    request.body.validate[AllowedUser].fold( err => Future.successful(BadRequest), valid =>
-      if (valid.code == accessCode) createAccess(valid.email).map{r => Ok}  else Future.successful(BadRequest)
+    request.body.validate[AllowedUser].fold( err => BadRequest, valid =>
+      if (valid.code == accessCode) {
+        createAccess(valid.email)
+        Ok
+      } else BadRequest
     )
   }
 
