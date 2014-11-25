@@ -85,7 +85,7 @@ object Global extends WithFilters(CORSFilter) with GlobalSettings {
       |Dans la vallée de Dana La Lilala.
       |Dans la vallée des chants de guerre près des tombeaux.""".stripMargin
 
-    val song = DBSongDao.create(Song(None, "La tribu de Dana"))
+    val song = DBSongDao.create(Song(None, "La tribu de Dana", "https://www.youtube.com/watch?v=80_t0ssDHQY"))
     val generator = new AssignmentGenerator(song.id.get, 3)
     generator.parseSong(tribueDeDana).foreach(DBAssignmentDao.create)
 

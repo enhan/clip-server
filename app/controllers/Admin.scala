@@ -25,7 +25,6 @@ object Admin extends Controller{
       (JsPath \ "email").read[String](Reads.email)
     )(AllowedUser.apply _)
 
-
   def grantAccess() = Action.async(parse.json){ implicit request =>
 
     def createAccess(email: String) = {

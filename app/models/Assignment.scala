@@ -9,7 +9,7 @@ import play.api.Play.current
 /**
  * @author Emmanuel Nhan
  */
-case class Assignment(id: Option[Long], songId: Long, rank: Int, content: String, pre: String, post:String, spots:Int, spotsTaken: Long = 0)
+case class Assignment(id: Option[Long], songId: Long, rank: Int, content: String, pre: String, post:String, spots:Int, spotsTaken: Long = 0, startTime: String = "")
 
 trait AssignmentDao{
   def create(a :Assignment): Assignment
@@ -19,6 +19,8 @@ trait AssignmentDao{
   def findForSongId(songId: Long): List[Assignment]
 
   def findById(id: Long): Option[Assignment]
+
+  def update(a: Assignment): Assignment
 
 }
 
@@ -34,8 +36,9 @@ object DBAssignmentDao extends AssignmentDao{
     get[String]("pre") ~
     get[String]("post") ~
     get[Int]("spots") ~
-    get[Long]("spots_taken") map {
-      case id~songId~rank~content~pre~post~spots~spotsTaken => Assignment(Some(id), songId, rank, content, pre, post, spots, spotsTaken)
+    get[Long]("spots_taken") ~
+    get[Option[String]]("start_time")  map {
+      case id~songId~rank~content~pre~post~spots~spotsTaken~startTime => Assignment(Some(id), songId, rank, content, pre, post, spots, spotsTaken, startTime.getOrElse(""))
     }
   }
 
@@ -45,7 +48,7 @@ object DBAssignmentDao extends AssignmentDao{
   }
 
   override def findAll: List[Assignment] = DB.withConnection{implicit c =>
-    val selectAll = SQL"""select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id"""
+    val selectAll = SQL"""select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken, a.start_time as start_time from Assignment a left join  Engagement e on (a.id = e.assignment_id) group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id, a.start_time"""
     val result =selectAll.as(assignmentParser *).toList
     Logger.debug("RES = " + result)
     result
@@ -53,13 +56,17 @@ object DBAssignmentDao extends AssignmentDao{
 
 
   override def findForSongId(songId: Long): List[Assignment] = DB.withConnection{implicit c =>
-    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.song_id = $songId group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id order by a.rank""".as(assignmentParser *).toList
+    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken, a.start_time as start_time  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.song_id = $songId group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id, a.start_time order by a.rank""".as(assignmentParser *).toList
   }
 
   override def findById(id: Long): Option[Assignment] = DB.withConnection{implicit c =>
-    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.id = $id group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id""".as(assignmentParser.singleOpt)
+    SQL""" select a.id as id, a.song_id as song_id, a.rank as rank, a.content as content, a.pre as pre, a.post as post, a.spots as spots, count(e.id) as spots_taken, a.start_time as start_time  from Assignment a left join  Engagement e on (a.id = e.assignment_id) where a.id = $id group by a.song_id, a.rank, a.content, a.pre, a.post, a.spots, a.id, a.start_time""".as(assignmentParser.singleOpt)
   }
 
+  override def update(a: Assignment): Assignment = DB.withConnection{ implicit c =>
+    SQL"""update Assignment set start_time = ${a.startTime} where id = ${a.id}""".executeUpdate()
+    a
+  }
 }
 
 

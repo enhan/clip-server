@@ -1,5 +1,5 @@
 {
     "deploy": {
-        "goal": "-DapplyEvolutions.default=true"
+        "goal": "-DapplyEvolutions.default=true -Dconfig.resource=prod.conf"
     }
 }
