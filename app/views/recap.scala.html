@@ -6,11 +6,21 @@
     <h2>@song.name</h2>
     @for(engagement <- engagements(song)){
         <p>
-            @engagement.pre
-            <br/>
+            @if(!song.videoLink.isEmpty && !engagement.startTime.isEmpty){
+                @defining(song.videoLink + "&t=" + engagement.startTime ) { assignmentLink =>
+                    <a href="@assignmentLink">Extrait vidéo</a>
+                    <br/>
+                }
+            }
+            @if(!engagement.pre.isEmpty) {
+                @engagement.pre
+                <br/>
+            }
             @engagement.content
-            <br/>
-            @engagement.post
+            @if(!engagement.post.isEmpty) {
+                <br/>
+                @engagement.post
+            }
         </p>
     }
 }
