@@ -16,8 +16,9 @@ object Assignments extends Controller{
       (JsPath \ "pre").write[String] and
       (JsPath \ "post").write[String] and
       (JsPath \ "content").write[String] and
-      (JsPath \ "available").write[Boolean]
-    )((a:Assignment) => (a.id, a.pre, a.post, a.content, a.spotsTaken < a.spots))
+      (JsPath \ "available").write[Boolean] and
+      (JsPath \ "startTime").write[String]
+    )((a:Assignment) => (a.id, a.pre, a.post, a.content, a.spotsTaken < a.spots, a.startTime))
 
   implicit val songWrites: Writes[Song] = (
     (JsPath \ "id").writeNullable[Long] and
