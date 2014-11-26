@@ -8,11 +8,12 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
 import play.api.Play.current
+import utils.SecuredController
 
 /**
  * @author Emmanuel Nhan
  */
-object Admin extends Controller{
+object Admin extends SecuredController{
 
 
   case class AllowedUser(code: String, email: String)
@@ -25,7 +26,7 @@ object Admin extends Controller{
       (JsPath \ "email").read[String](Reads.email)
     )(AllowedUser.apply _)
 
-  def grantAccess() = Action(parse.json){ implicit request =>
+  def grantAccess() = AdminSecuredAction(parse.json){ implicit request =>
 
     def createAccess(email: String) = {
       AccessManager.grantAccessTo(email)
@@ -43,7 +44,7 @@ object Admin extends Controller{
     )
   }
 
-  def grantedAccess = Action{
+  def grantedAccess = AdminSecuredAction{
     Ok(Json.toJson(AccessManager.allAccess))
   }
 
