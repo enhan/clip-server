@@ -6,11 +6,13 @@
 OPTIONS        /*all                         controllers.OptionsController.returnsOk(all)
 GET            /songs                        controllers.Assignments.getAll
 POST           /songs                        controllers.Assignments.createSong
-PUT            /songs/:id/video                    controllers.Assignments.updateSong(id: Long)
+PUT            /songs/:id/video              controllers.Assignments.updateSong(id: Long)
 GET            /songs/:id/assignments        controllers.Assignments.assignmentsForSong(id: Long)
 GET            /assignments                  controllers.Assignments.getAllAssignments
 PUT            /assignments/:id/start        controllers.Assignments.updateAssignment(id: Long)
 POST           /engagements                  controllers.Engagements.createEngagements
+GET            /engagements/:email           controllers.Engagements.engagementsByMail(email: String)
+DELETE         /engagements                  controllers.Engagements.deleteAll
 POST           /access                       controllers.Access.controlAccess()
 
 # Admin

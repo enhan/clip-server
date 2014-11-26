@@ -24,6 +24,14 @@ object Engagements extends Controller{
       (JsPath \ "email").read[String](Reads.email)
     )((assignment, email) => Engagement(None, email, assignment, completed = false))
 
+
+  implicit val engagementsWrites: Writes[Engagement] = (
+    (JsPath \ "id").writeNullable[Long] and
+      (JsPath \ "email").write[String] and
+      (JsPath \ "assignment").write[Long] and
+      (JsPath \ "completed").write[Boolean]
+    )(unlift(Engagement.unapply))
+
   def createEngagements = Action(parse.json){ implicit request =>
     request.body.validate[List[Engagement]].map{engagements =>
       val created = engagements.map(DBEngagementDao.createEngagement)
@@ -51,4 +59,13 @@ object Engagements extends Controller{
 
   }
 
+  def engagementsByMail(email:String) = Action{ implicit request=>
+    val engagements =DBEngagementDao.findByEmail(email)
+    Ok(Json.toJson(engagements))
+  }
+
+  def deleteAll() = Action{implicit request =>
+    DBEngagementDao.clearAll
+    Ok
+  }
 }
