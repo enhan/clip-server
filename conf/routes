@@ -11,6 +11,7 @@ GET            /songs/:id/assignments        controllers.Assignments.assignments
 GET            /assignments                  controllers.Assignments.getAllAssignments
 PUT            /assignments/:id/start        controllers.Assignments.updateAssignment(id: Long)
 POST           /engagements                  controllers.Engagements.createEngagements
+GET            /engagements                  controllers.Engagements.allEngagements
 GET            /engagements/:email           controllers.Engagements.engagementsByMail(email: String)
 DELETE         /engagements                  controllers.Engagements.deleteAll
 POST           /access                       controllers.Access.controlAccess()
