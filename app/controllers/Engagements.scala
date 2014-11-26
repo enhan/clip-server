@@ -9,13 +9,13 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
-
+import utils.SecuredController
 
 
 /**
  * @author Emmanuel Nhan
  */
-object Engagements extends Controller{
+object Engagements extends SecuredController{
 
   val assignmentDao: AssignmentDao = DBAssignmentDao
 
@@ -59,17 +59,17 @@ object Engagements extends Controller{
 
   }
 
-  def engagementsByMail(email:String) = Action{ implicit request=>
+  def engagementsByMail(email:String) = AdminSecuredAction{ implicit request=>
     val engagements =DBEngagementDao.findByEmail(email)
     Ok(Json.toJson(engagements))
   }
 
-  def allEngagements = Action{ implicit request =>
+  def allEngagements = AdminSecuredAction{ implicit request =>
     val engagements = DBEngagementDao.findAll
     Ok(Json.toJson(engagements))
   }
 
-  def deleteAll() = Action{implicit request =>
+  def deleteAll() = AdminSecuredAction{implicit request =>
     DBEngagementDao.clearAll
     Ok
   }

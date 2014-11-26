@@ -48,4 +48,9 @@ object Admin extends SecuredController{
     Ok(Json.toJson(AccessManager.allAccess))
   }
 
+  def deleteAccess = AdminSecuredAction{
+    AccessManager.deleteAll
+    Ok
+  }
+
 }

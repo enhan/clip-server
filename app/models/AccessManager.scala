@@ -10,6 +10,9 @@ import play.api.Play.current
  * @author Emmanuel Nhan
  */
 object AccessManager {
+  def deleteAll: Unit = DB.withConnection{ implicit c =>
+    SQL"""DELETE FROM AllowedEmail""".execute()
+  }
 
 
   def grantAccessTo(email: String): Unit = DB.withConnection{implicit c =>
