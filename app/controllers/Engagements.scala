@@ -64,6 +64,11 @@ object Engagements extends Controller{
     Ok(Json.toJson(engagements))
   }
 
+  def allEngagements = Action{ implicit request =>
+    val engagements = DBEngagementDao.findAll
+    Ok(Json.toJson(engagements))
+  }
+
   def deleteAll() = Action{implicit request =>
     DBEngagementDao.clearAll
     Ok

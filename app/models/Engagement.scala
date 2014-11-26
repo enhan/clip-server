@@ -20,6 +20,8 @@ trait EngagementDao{
 
   def findByEmail(email:String) : List[Engagement]
 
+  def findAll : List[Engagement]
+
 }
 
 
@@ -47,5 +49,9 @@ object DBEngagementDao extends EngagementDao{
 
   override def findByEmail(email: String): List[Engagement] = DB.withConnection{implicit connection =>
     SQL"""select id, email, assignment_id, completed from Engagement where email = $email """.executeQuery().parse(parser *)
+  }
+
+  override def findAll: List[Engagement] = DB.withConnection{ implicit connection =>
+    SQL"""select id, email, assignment_id, completed from Engagement""".executeQuery().parse(parser *)
   }
 }
