@@ -29,8 +29,9 @@ object Engagements extends SecuredController{
     (JsPath \ "id").writeNullable[Long] and
       (JsPath \ "email").write[String] and
       (JsPath \ "assignment").write[Long] and
-      (JsPath \ "completed").write[Boolean]
-    )(unlift(Engagement.unapply))
+      (JsPath \ "completed").write[Boolean] and
+      (JsPath \ "date").write[String]
+    )(e => (e.id, e.email, e.assignmentId, e.completed, "2014-12-18"))
 
   def createEngagements = Action(parse.json){ implicit request =>
     request.body.validate[List[Engagement]].map{engagements =>
@@ -71,6 +72,16 @@ object Engagements extends SecuredController{
 
   def deleteAll() = AdminSecuredAction{implicit request =>
     DBEngagementDao.clearAll
+    Ok
+  }
+
+  def myEngagements(songId: Long, by: String, state: String) = Action{
+    // TODO
+    Ok
+  }
+
+  def upload(id: Long) = Action{
+    // TODO
     Ok
   }
 }

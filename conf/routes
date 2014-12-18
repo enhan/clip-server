@@ -3,23 +3,32 @@
 # ~~~~
 
 # Home page
-OPTIONS        /*all                         controllers.OptionsController.returnsOk(all)
-GET            /songs                        controllers.Assignments.getAll
-POST           /songs                        controllers.Assignments.createSong
-PUT            /songs/:id/video              controllers.Assignments.updateSong(id: Long)
-GET            /songs/:id/assignments        controllers.Assignments.assignmentsForSong(id: Long)
-GET            /assignments                  controllers.Assignments.getAllAssignments
-PUT            /assignments/:id/start        controllers.Assignments.updateAssignment(id: Long)
-POST           /engagements                  controllers.Engagements.createEngagements
-GET            /engagements                  controllers.Engagements.allEngagements
-GET            /engagements/:email           controllers.Engagements.engagementsByMail(email: String)
-DELETE         /engagements                  controllers.Engagements.deleteAll
-POST           /access                       controllers.Access.controlAccess()
+OPTIONS        /*all                               controllers.OptionsController.returnsOk(all)
+GET            /songs                              controllers.Assignments.getAll
+POST           /songs                              controllers.Assignments.createSong
+PUT            /songs/:id/video                    controllers.Assignments.updateSong(id: Long)
+GET            /songs/:id/assignments              controllers.Assignments.assignmentsForSong(id: Long)
+GET            /assignments                        controllers.Assignments.getAllAssignments
+PUT            /assignments/:id/start              controllers.Assignments.updateAssignment(id: Long)
+POST           /engagements                        controllers.Engagements.createEngagements
+GET            /engagements                        controllers.Engagements.allEngagements
+GET            /engagements/:email                 controllers.Engagements.engagementsByMail(email: String)
+DELETE         /engagements                        controllers.Engagements.deleteAll
+POST           /access                             controllers.Access.controlAccess()
+POST           /engagements/:id/video              controllers.Engagements.upload(id: Long)
+GET            /engagements/songs/:songId          controllers.Engagements.myEngagements(songId: Long, by: String, state: String ?= "pending")
+
+
 
 # Admin
-POST           /admin/access                 controllers.Admin.grantAccess
-GET            /admin/access                 controllers.Admin.grantedAccess
-DELETE         /admin/access                 controllers.Admin.deleteAccess
+POST           /admin/access                       controllers.Admin.grantAccess
+GET            /admin/access                       controllers.Admin.grantedAccess(state: String ?= "all")
+DELETE         /admin/access                       controllers.Admin.deleteAccess
+GET            /admin/engagements                  controllers.Engagements.allEngagements
+GET            /admin/songs/:id/assignments        controllers.Assignments.assignmentsForSong(id: Long)
+
+POST           /admin/reminders/not-engaged        controllers.Admin.remindNotEngaged
+POST           /admin/reminders/engaged            controllers.Admin.remindEngaged
 
 
 

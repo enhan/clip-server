@@ -44,8 +44,13 @@ object Admin extends SecuredController{
     )
   }
 
-  def grantedAccess = AdminSecuredAction{
-    Ok(Json.toJson(AccessManager.allAccess))
+  def grantedAccess(state: String) = AdminSecuredAction{
+    state match{
+      case "all" => Ok(Json.toJson(AccessManager.allAccess))
+      case "engaged" => Ok(Json.toJson(AccessManager.allAccess))
+      case "not-engaged" => Ok(Json.toJson(AccessManager.allAccess))
+      case _ => BadRequest
+    }
   }
 
   def deleteAccess = AdminSecuredAction{
@@ -53,4 +58,13 @@ object Admin extends SecuredController{
     Ok
   }
 
+  def remindNotEngaged() = Action{
+    // TODO
+    Ok(Json.obj("hits" -> 42))
+  }
+
+  def remindEngaged() = Action{
+    // TODO
+    Ok(Json.obj("hits" -> 32))
+  }
 }
