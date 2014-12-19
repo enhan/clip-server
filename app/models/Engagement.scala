@@ -33,7 +33,6 @@ trait EngagementDao{
 
 object DBEngagementDao extends EngagementDao{
 
-
   val parser ={
     get[Long]("id") ~
     get[String]("email") ~
@@ -67,5 +66,17 @@ object DBEngagementDao extends EngagementDao{
   override def updateEngagement(engagement: Engagement): Engagement = DB.withConnection{ implicit connection =>
     SQL"""update Engagement set email = ${engagement.email}, assignment_id = ${engagement.assignmentId}, completed = ${engagement.completed} where id = ${engagement.id.get}""".executeUpdate()
     engagement
+  }
+
+  def findByEmailOnSong(email: String, songId: Long): List[Engagement] = DB.withConnection{ implicit connection =>
+    SQL"""select en.id, email, assignment_id, completed from Engagement en, Assignment a where a.id = en.assignment_id and email = $email and a.song_id = $songId""".as(parser *)
+  }
+
+  def findCompletedByEmailOnSong(email: String, songId: Long): List[Engagement] = DB.withConnection{ implicit connection =>
+    SQL"""select en.id, email, assignment_id, completed from Engagement en, Assignment a where a.id = en.assignment_id and email = $email and a.song_id = $songId and completed""".as(parser *)
+  }
+
+  def findPendingByEmailOnSong(email: String, songId: Long): List[Engagement] = DB.withConnection{implicit  connection =>
+    SQL"""select en.id, email, assignment_id, completed from Engagement en, Assignment a where a.id = en.assignment_id and email = $email and a.song_id = $songId and not completed""".as(parser *)
   }
 }

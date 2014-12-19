@@ -22,6 +22,8 @@ object Engagements extends SecuredController{
 
   val assignmentDao: AssignmentDao = DBAssignmentDao
 
+  val fileBucket = play.api.Play.configuration.getString("upload.folder").getOrElse("/tmp/videos")
+
   implicit val engagementsReads: Reads[Engagement] = (
     (JsPath \ "assignmentId").read[Long](Reads.filter[Long](ValidationError("assignment.not.found"))(l => DBAssignmentDao.findById(l).isDefined)) and
       (JsPath \ "email").read[String](Reads.email)
@@ -78,9 +80,13 @@ object Engagements extends SecuredController{
     Ok
   }
 
-  def myEngagements(songId: Long, by: String, state: String) = Action{
-    // TODO
-    Ok
+  def myEngagements(songId: Long, by: String, state: String) = AdminSecuredAction{
+    state match{
+      case "pending" => Ok(Json.toJson(DBEngagementDao.findPendingByEmailOnSong(by, songId)))
+      case "completed" => Ok(Json.toJson(DBEngagementDao.findCompletedByEmailOnSong(by, songId)))
+      case "all" => Ok(Json.toJson(DBEngagementDao.findByEmailOnSong(by, songId)))
+      case _ => BadRequest
+    }
   }
 
   def upload(id: Long) = Action(parse.temporaryFile) { request =>
@@ -88,7 +94,7 @@ object Engagements extends SecuredController{
       case Some(e) =>
         val fileName = UUID.randomUUID().toString
         val achievement = Achievement(None, e.assignmentId, fileName)
-        request.body.moveTo(new File("/tmp/videos/" + fileName))
+        request.body.moveTo(new File(fileBucket + "/" + fileName))
         DBEngagementDao.updateEngagement(e.copy(completed = true))
         DBAchievementDao.create(achievement)
         Ok
