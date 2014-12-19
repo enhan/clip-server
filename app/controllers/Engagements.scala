@@ -1,5 +1,8 @@
 package controllers
 
+import java.io.File
+import java.util.UUID
+
 import actors.{SendSummary, MailActor}
 import akka.actor.Props
 import models._
@@ -80,8 +83,16 @@ object Engagements extends SecuredController{
     Ok
   }
 
-  def upload(id: Long) = Action{
-    // TODO
-    Ok
+  def upload(id: Long) = Action(parse.temporaryFile) { request =>
+    DBEngagementDao.findById(id) match {
+      case Some(e) =>
+        val fileName = UUID.randomUUID().toString
+        val achievement = Achievement(None, e.assignmentId, fileName)
+        request.body.moveTo(new File("/tmp/videos/" + fileName))
+        DBEngagementDao.updateEngagement(e.copy(completed = true))
+        DBAchievementDao.create(achievement)
+        Ok
+      case None => NotFound
+    }
   }
 }

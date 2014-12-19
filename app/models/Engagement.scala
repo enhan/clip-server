@@ -22,12 +22,17 @@ trait EngagementDao{
 
   def findAll : List[Engagement]
 
+  def findById(id: Long): Option[Engagement]
+
+  def updateEngagement(engagement: Engagement): Engagement
+
 }
 
 
 
 
 object DBEngagementDao extends EngagementDao{
+
 
   val parser ={
     get[Long]("id") ~
@@ -53,5 +58,14 @@ object DBEngagementDao extends EngagementDao{
 
   override def findAll: List[Engagement] = DB.withConnection{ implicit connection =>
     SQL"""select id, email, assignment_id, completed from Engagement""".executeQuery().parse(parser *)
+  }
+
+  override def findById(id: Long): Option[Engagement] = DB.withConnection{ implicit connection =>
+    SQL"""select id, email, assignment_id, completed from Engagement where id = $id""".executeQuery().parse(parser.singleOpt)
+  }
+
+  override def updateEngagement(engagement: Engagement): Engagement = DB.withConnection{ implicit connection =>
+    SQL"""update Engagement set email = ${engagement.email}, assignment_id = ${engagement.assignmentId}, completed = ${engagement.completed} where id = ${engagement.id.get}""".executeUpdate()
+    engagement
   }
 }

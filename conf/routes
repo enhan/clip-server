@@ -26,6 +26,7 @@ GET            /admin/access                       controllers.Admin.grantedAcce
 DELETE         /admin/access                       controllers.Admin.deleteAccess
 GET            /admin/engagements                  controllers.Engagements.allEngagements
 GET            /admin/songs/:id/assignments        controllers.Assignments.assignmentsForSong(id: Long)
+GET            /admin/achievements                 controllers.Admin.uploadList()
 
 POST           /admin/reminders/not-engaged        controllers.Admin.remindNotEngaged
 POST           /admin/reminders/engaged            controllers.Admin.remindEngaged

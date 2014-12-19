@@ -2,7 +2,7 @@ package controllers
 
 import actors.{MailActor, SendWelcome}
 import akka.actor.Props
-import models.AccessManager
+import models.{DBAchievementDao, Achievement, AccessManager}
 import play.api.libs.concurrent.Akka
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -26,6 +26,12 @@ object Admin extends SecuredController{
       (JsPath \ "email").read[String](Reads.email)
     )(AllowedUser.apply _)
 
+  implicit val writes: Writes[Achievement] = (
+    (JsPath \ "id").writeNullable[Long] ~
+      (JsPath \ "assignmentId").write[Long] ~
+      (JsPath \ "fileName").write[String]
+    )(unlift(Achievement.unapply))
+
   def grantAccess() = AdminSecuredAction(parse.json){ implicit request =>
 
     def createAccess(email: String) = {
@@ -45,6 +51,7 @@ object Admin extends SecuredController{
   }
 
   def grantedAccess(state: String) = AdminSecuredAction{
+    // TODO
     state match{
       case "all" => Ok(Json.toJson(AccessManager.allAccess))
       case "engaged" => Ok(Json.toJson(AccessManager.allAccess))
@@ -67,4 +74,10 @@ object Admin extends SecuredController{
     // TODO
     Ok(Json.obj("hits" -> 32))
   }
+
+  def uploadList() = AdminSecuredAction{
+    val achievements = DBAchievementDao.getAll
+    Ok(Json.toJson(achievements))
+  }
 }
+
