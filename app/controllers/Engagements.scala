@@ -80,7 +80,7 @@ object Engagements extends SecuredController{
     Ok
   }
 
-  def myEngagements(songId: Long, by: String, state: String) = AdminSecuredAction{
+  def myEngagements(songId: Long, by: String, state: String) = Action{
     state match{
       case "pending" => Ok(Json.toJson(DBEngagementDao.findPendingByEmailOnSong(by, songId)))
       case "completed" => Ok(Json.toJson(DBEngagementDao.findCompletedByEmailOnSong(by, songId)))
