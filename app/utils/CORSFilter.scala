@@ -16,7 +16,7 @@ object CORSFilter extends Filter{
     def cors(result: Result): Result = {
       result.withHeaders("Access-Control-Allow-Origin" -> "*",
         "Access-Control-Allow-Methods" -> "POST, GET, OPTIONS, PUT, DELETE",
-        "Access-Control-Allow-Headers" -> "x-requested-with,content-type,Cache-Control,Pragma,Date"
+        "Access-Control-Allow-Headers" -> "x-requested-with,content-type,Cache-Control,Pragma,Date,Authorization"
       )
     }
 
