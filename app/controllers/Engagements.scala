@@ -6,6 +6,7 @@ import java.util.UUID
 import actors.{SendSummary, MailActor}
 import akka.actor.Props
 import models._
+import play.api.Logger
 import play.api.data.validation.ValidationError
 import play.api.mvc._
 import play.api.libs.json._
@@ -89,16 +90,24 @@ object Engagements extends SecuredController{
     }
   }
 
-  def upload(id: Long) = Action(parse.temporaryFile) { request =>
-    DBEngagementDao.findById(id) match {
-      case Some(e) =>
-        val fileName = UUID.randomUUID().toString
-        val achievement = Achievement(None, e.assignmentId, fileName)
-        request.body.moveTo(new File(fileBucket + "/" + fileName))
-        DBEngagementDao.updateEngagement(e.copy(completed = true))
-        DBAchievementDao.create(achievement)
-        Ok
-      case None => NotFound
+  def upload(id: Long) = Action(parse.multipartFormData) { request =>
+    Logger.debug(s"Uploading video for engagement $id")
+    request.body.file("video").map { videoFile =>
+      import java.io.File
+      DBEngagementDao.findById(id) match {
+        case Some(e) =>
+          val fileName = UUID.randomUUID().toString
+          val achievement = Achievement(None, e.assignmentId, fileName)
+          videoFile.ref.moveTo(new File(fileBucket + "/" + fileName))
+          DBEngagementDao.updateEngagement(e.copy(completed = true))
+          DBAchievementDao.create(achievement)
+          Ok
+        case None => NotFound
+      }
+    }.getOrElse{
+      BadRequest
     }
+
+
   }
 }
