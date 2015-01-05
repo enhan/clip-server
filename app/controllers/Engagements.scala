@@ -98,14 +98,16 @@ object Engagements extends SecuredController{
         case Some(e) =>
           val fileName = UUID.randomUUID().toString
           val achievement = Achievement(None, e.assignmentId, fileName)
+          // Ensure fileBucket is up
+          new File(fileBucket).mkdirs()
           videoFile.ref.moveTo(new File(fileBucket + "/" + fileName))
           DBEngagementDao.updateEngagement(e.copy(completed = true))
           DBAchievementDao.create(achievement)
           Ok.withHeaders(("Access-Control-Allow-Origin","*" ))
-        case None => NotFound
+        case None => NotFound.withHeaders(("Access-Control-Allow-Origin","*" ))
       }
     }.getOrElse{
-      BadRequest
+      BadRequest.withHeaders(("Access-Control-Allow-Origin","*" ))
     }
 
 
