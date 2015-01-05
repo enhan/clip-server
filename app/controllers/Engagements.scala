@@ -101,7 +101,7 @@ object Engagements extends SecuredController{
           videoFile.ref.moveTo(new File(fileBucket + "/" + fileName))
           DBEngagementDao.updateEngagement(e.copy(completed = true))
           DBAchievementDao.create(achievement)
-          Ok
+          Ok.withHeaders(("Access-Control-Allow-Origin","*" ))
         case None => NotFound
       }
     }.getOrElse{
