@@ -104,7 +104,9 @@ object Engagements extends SecuredController{
           DBEngagementDao.updateEngagement(e.copy(completed = true))
           DBAchievementDao.create(achievement)
           Ok.withHeaders(("Access-Control-Allow-Origin","*" ))
-        case None => NotFound.withHeaders(("Access-Control-Allow-Origin","*" ))
+        case None =>
+          Logger.debug(s"Engagement $id not found !")
+          NotFound.withHeaders(("Access-Control-Allow-Origin","*" ))
       }
     }.getOrElse{
       BadRequest.withHeaders(("Access-Control-Allow-Origin","*" ))
